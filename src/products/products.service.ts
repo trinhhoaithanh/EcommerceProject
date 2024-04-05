@@ -25,26 +25,26 @@ export class ProductsService {
 
   //get product by product id
   async getProductsByProductId(product_id: number): Promise<any> {
-    try {
-      let checkProduct = await this.prisma.products.findUnique({
-        where:{
-           
-              product_id:  Number(product_id)
-      
-        }
-      })
+      try {
+        let checkProduct = await this.prisma.products.findUnique({
+          where:{
+            
+                product_id:  Number(product_id)
+        
+          }
+        })
 
-      if (checkProduct) {
-        console.log(checkProduct)
-        return responseObject(200, 'Get products by id successfully!', checkProduct); 
+        if (checkProduct) {
+          console.log(checkProduct)
+          return responseObject(200, 'Get products by id successfully!', checkProduct); 
+        }
+        else {
+          throw new NotFoundException(responseObject(404, "Request is invalid", "Product is not found!")); 
+        }
       }
-      else {
-        throw new NotFoundException(responseObject(404, "Request is invalid", "Product is not found!")); 
+      catch (err) {
+        throw new HttpException(err.response, err.status);
       }
-    }
-    catch (err) {
-      throw new HttpException(err.response, err.status);
-    }
   }
 
   //get product by category id

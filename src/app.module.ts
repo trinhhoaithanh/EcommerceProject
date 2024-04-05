@@ -8,9 +8,10 @@ import { ProductsModule } from './products/products.module';
 import { StoresModule } from './stores/stores.module';
 import { UsersModule } from './users/users.module';
 import { VouchersModule } from './vouchers/vouchers.module';
+import { FeesModule } from './fees/fees.module';
 
 @Module({
-  imports: [CategoriesModule, OrderItemsModule, OrdersModule, ProductsModule, StoresModule, UsersModule, VouchersModule],
+  imports: [CategoriesModule, OrderItemsModule, OrdersModule, ProductsModule, StoresModule, UsersModule, VouchersModule, FeesModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -8,13 +8,13 @@ datasource db {
 }
 
 model categories {
-  category_id   Int        @id @default(autoincrement())
+  category_id   Int        @id
   category_name String?    @db.VarChar(255)
   products      products[]
 }
 
 model order_items {
-  order_item_id Int       @id @default(autoincrement())
+  order_item_id Int       @id
   order_id      Int?
   product_id    Int?
   quantity      Int?
@@ -26,11 +26,12 @@ model order_items {
 }
 
 model orders {
-  order_id     Int           @id @default(autoincrement())
+  order_id     Int           @id
   user_id      Int?
   store_id     Int?
-  total_amount Decimal?      @db.Decimal(10, 2)
+  total_amount Float?        @db.Float
   order_date   DateTime?     @db.Timestamp(0)
+  fees         fees[]
   order_items  order_items[]
   users        users?        @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "orders_ibfk_1")
   stores       stores?       @relation(fields: [store_id], references: [store_id], onDelete: NoAction, onUpdate: NoAction, map: "orders_ibfk_2")
@@ -40,12 +41,12 @@ model orders {
 }
 
 model products {
-  product_id          Int           @id @default(autoincrement())
+  product_id          Int           @id
   product_name        String?       @db.VarChar(255)
   product_description String?       @db.Text
   category_id         Int?
-  product_price       Decimal?      @db.Decimal(10, 2)
-  discount_percentage Decimal?      @db.Decimal(5, 2)
+  product_price       Float?        @db.Float
+  discount_percentage Float?        @db.Float
   order_items         order_items[]
   categories          categories?   @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "products_ibfk_1")
 
@@ -53,14 +54,14 @@ model products {
 }
 
 model stores {
-  store_id          Int      @id @default(autoincrement())
+  store_id          Int      @id
   store_name        String?  @db.VarChar(255)
   number_of_product Int?
   orders            orders[]
 }
 
 model users {
-  user_id      Int        @id @default(autoincrement())
+  user_id      Int        @id
   user_name    String?    @db.VarChar(255)
   user_email   String?    @db.VarChar(255)
   user_address String?    @db.Text
@@ -70,10 +71,20 @@ model users {
 }
 
 model vouchers {
-  voucher_id          Int      @id @default(autoincrement())
+  voucher_id          Int    @id
   user_id             Int?
-  discount_percentage Decimal? @db.Decimal(5, 2)
-  users               users?   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "vouchers_ibfk_1")
+  discount_percentage Float? @db.Float
+  users               users? @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "vouchers_ibfk_1")
 
   @@index([user_id], map: "user_id")
+}
+
+model fees {
+  fee_id     Int     @id
+  fee_name   String? @db.VarChar(255)
+  fee_amount Float?  @db.Float
+  order_id   Int?
+  orders     orders? @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction, map: "fees_ibfk_1")
+
+  @@index([order_id], map: "order_id")
 }

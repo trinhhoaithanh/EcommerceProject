@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { Order } from './entities/order.entity';
 
 @Injectable()
 export class OrdersService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
-  }
+  prisma = new PrismaClient();
+  async checkout(order_id: number, order: Order, user_id: number) {
+    const existingOrder = await this.prisma.orders.findFirst({
+      where: {
+        order_id: Number(order_id),
+      },
+    });
 
-  findAll() {
-    return `This action returns all orders`;
-  }
+    if (!existingOrder) {
+      throw new NotFoundException('Order not found');
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
+    const discount = await this.prisma.vouchers.findFirst({
+      where: {
+        user_id: Number(user_id),
+        discount_percentage: {
+          gt: 0,
+        },
+      },
+    });
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
+    if (discount) {
+      existingOrder.total_amount -= existingOrder.total_amount * (discount.discount_percentage / 100);
+      
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+    // Save the updated order
+    const updatedOrder = await this.prisma.orders.update({
+      where: {
+        order_id: Number(order_id),
+      },
+
+      data: {
+        total_amount: existingOrder.total_amount,
+      },
+    });
+    return updatedOrder;
   }
 }

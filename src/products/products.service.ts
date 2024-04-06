@@ -35,7 +35,6 @@ export class ProductsService {
         })
 
         if (checkProduct) {
-          console.log(checkProduct)
           return responseObject(200, 'Get products by id successfully!', checkProduct); 
         }
         else {
@@ -49,7 +48,7 @@ export class ProductsService {
 
   //get product by category id
   async getProductsByCategoryId(category_id: number): Promise<any> {
-    // try {
+    try {
       let checkCategory = await this.prisma.products.findMany({
         where:{
            categories:{
@@ -61,15 +60,14 @@ export class ProductsService {
       })
 
       if (checkCategory) {
-        console.log(checkCategory)
         return responseObject(200, 'Get products successfully!', checkCategory); 
       }
       else {
         throw new NotFoundException(responseObject(404, "Request is invalid", "Category is not found!")); 
       }
-    // }
-    // catch (err) {
-    //   throw new HttpException(err.response, err.status);
-    // }
+    }
+    catch (err) {
+      throw new HttpException(err.response, err.status);
+    }
   }
   }
